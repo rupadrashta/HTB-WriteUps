@@ -29,4 +29,13 @@ Nmap done: 1 IP address (1 host up) scanned in 24.71 seconds
 ```
 
 
-The scan shows that FTP and HTTP ports are open. 
+The scan shows that FTP and HTTP ports are open. Anonymous FTP is on. 
+Microsoft IIS server is running, and FTP result shows that iisstart.htm and welcome.png, the files that are served by IIS Server, are in the same file path for FTP.
+
+We can test it by sending a file through FTP. I created a random .htm file (since the other file was a .htm), and FTP'd to Devel VM, and then browsed to http://10.10.10.5/<FILENAME> and it worked.
+  
+  Tried to use Metasploit for exploitation. Metaspoit has an auxiliary FTP scanner to detect anonymous login (auxiliary/scanner/ftp/anonymous), but I could not figure out how to use that for exploiting. 
+
+  So whatever I send now, has to be through FTP and it should be good enough to have a reverse tcp shell. 
+  
+ I used Social ENgineering Toolkit to create a payload with reverse_tcp, saved it as .aspx file, and FTP'd to 10.10.10.5. When I brosed to the payload.aspx file though, I got a runtime error. So that did not work. 
