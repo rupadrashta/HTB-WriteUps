@@ -30,3 +30,38 @@ Nmap done: 1 IP address (1 host up) scanned in 21.13 seconds
 
 So SSH, DNS/TCP and HTTP ports are open.
 
+Connecting to the web page have me a 404, so I reset the machine. Even after that, I got the same results.
+
+I used curl in verbose mode to get more info.
+
+```
+──╼ $curl -vvv http://10.10.10.48
+*   Trying 10.10.10.48:80...
+* TCP_NODELAY set
+* Connected to 10.10.10.48 (10.10.10.48) port 80 (#0)
+> GET / HTTP/1.1
+> Host: 10.10.10.48
+> User-Agent: curl/7.68.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 404 Not Found
+< X-Pi-hole: A black hole for Internet advertisements.
+< Content-type: text/html; charset=UTF-8
+< Content-Length: 0
+< Date: Sun, 29 Nov 2020 17:15:15 GMT
+< Server: lighttpd/1.4.35
+< 
+* Connection #0 to host 10.10.10.48 left intact
+```
+
+This time I see "X-Pi-hole: A black hole for Internet advertisements.". Searching for this showed that this was a header for Raspberry Pi devices. Then I searched for Pi hole. It acts as a DNS server for a private network, has a modified dnsmasq, curl, lighthttpd, php, and admin dashboard. It can be used to block DNS requests for advertising domains. 
+
+Further research showed how to configure Pi hole...And the default SSH credentials are pi/raspberry. 
+
+I was able to SSH as pi.
+
+I got the user flag after logging in.
+
+
+
