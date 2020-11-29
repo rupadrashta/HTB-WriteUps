@@ -64,4 +64,70 @@ I was able to SSH as pi.
 I got the user flag after logging in.
 
 
+Running sudo shows that the user pi can run any command.
+```
+pi@raspberrypi:/home $ sudo -l
+Matching Defaults entries for pi on localhost:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
 
+User pi may run the following commands on localhost:
+    (ALL : ALL) ALL
+    (ALL) NOPASSWD: ALL
+```
+So I "sudo su -" and became root.
+
+The root.txt file did not have the flag but the content:
+```
+I lost my original root.txt! I think I may have a backup on my USB stick...
+
+```
+The mount command shows 
+```
+/dev/sdb on /media/usbstick type ext4 (ro,nosuid,nodev,noexec,relatime,data=ordered)
+```
+
+A read-only disk.
+
+When I cd to /media/usbstick, there's a file that shows that the content were deleted.
+
+```
+Damnit! Sorry man I accidentally deleted your files off the USB stick.
+Do you know if there is any way to get them back?
+
+-James
+```
+I did not know what /dev/sdb was, so I searched for it. 
+The command "sudo fdisk -l" shows the disk attached to the USB stick. 
+
+Running that command showed /dev/sdb.
+
+cat command showed some unprintable chars, along with the above file. So I tried strings command. This time, the output showed 
+
+```
+^Croot@raspberrypi:~# strings /dev/sdb
+>r &
+/media/usbstick
+lost+found
+root.txt
+damnit.txt
+>r &
+>r &
+/media/usbstick
+lost+found
+root.txt
+damnit.txt
+>r &
+/media/usbstick
+2]8^
+lost+found
+root.txt
+damnit.txt
+>r &
+3d3e483143ff12ec505d026fa13e020b
+Damnit! Sorry man I accidentally deleted your files off the USB stick.
+Do you know if there is any way to get them back?
+-James
+```
+
+I tried that long string  as the root flag and it worked.
