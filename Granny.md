@@ -60,3 +60,63 @@ PUT	asp	FAIL
 /usr/bin/davtest Summary:
 
 ```
+
+I ran Nikto scan and Dirbuster too. Dirbuster showed images folder but it was empty.
+```
+$nikto -host http://10.10.10.15
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          10.10.10.15
++ Target Hostname:    10.10.10.15
++ Target Port:        80
++ Start Time:         2020-12-26 15:30:36 (GMT-8)
+---------------------------------------------------------------------------
++ Server: Microsoft-IIS/6.0
++ Retrieved microsoftofficewebserver header: 5.0_Pub
++ Retrieved x-powered-by header: ASP.NET
+
+```
+The "x-powered-by header: ASP.NET" shows that aspx files may execute on the server. 
+
+I tried to upload an aspx file, but it did not work. Text files worked, but not aspx.
+
+```
+curl -X PUT http://10.10.10.15/boxy.txt -d @boxy.txt
+
+└──╼ $curl http://10.10.10.15/boxy.txt
+Boxing day!
+
+└──╼ $curl -X PUT http://10.10.10.15/boxy.aspx -d @boxy.txt
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<HTML><HEAD><TITLE>The page cannot be displayed</TITLE>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<STYLE type="text/css">
+  BODY { font: 8pt/12pt verdana }
+  H1 { font: 13pt/15pt verdana }
+  H2 { font: 8pt/12pt verdana }
+  A:link { color: red }
+  A:visited { color: maroon }
+</STYLE>
+</HEAD><BODY><TABLE width=500 border=0 cellspacing=10><TR><TD>
+
+<h1>The page cannot be displayed</h1>
+You have attempted to execute a CGI, ISAPI, or other executable program from a directory that does not allow programs to be executed.
+<hr>
+<p>Please try the following:</p>
+<ul>
+<li>Contact the Web site administrator if you believe this directory should allow execute access.</li>
+</ul>
+<h2>HTTP Error 403.1 - Forbidden: Execute access is denied.<br>Internet Information Services (IIS)</h2>
+<hr>
+<p>Technical Information (for support personnel)</p>
+<ul>
+<li>Go to <a href="http://go.microsoft.com/fwlink/?linkid=8180">Microsoft Product Support Services</a> and perform a title search for the words <b>HTTP</b> and <b>403</b>.</li>
+<li>Open <b>IIS Help</b>, which is accessible in IIS Manager (inetmgr),
+ and search for topics titled <b>Configuring ISAPI Extensions</b>, <b>Configuring CGI Applications</b>, <b>Securing Your Site with Web Site Permissions</b>, and <b>About Custom Error Messages</b>.</li>
+<li>In the IIS Software Development Kit (SDK) or at the <a href="http://go.microsoft.com/fwlink/?LinkId=8181">MSDN Online Library</a>, search for topics titled <b>Developing ISAPI Extensions</b>, <b>ISAPI and CGI</b>, and <b>Debugging ISAPI Extensions and Filters</b>.</li>
+</ul>
+
+</TD></TR></TABLE></BODY></HTML>
+
+
+```
