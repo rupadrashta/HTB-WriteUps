@@ -154,7 +154,10 @@ dav:/>
 ```
 We can do the same thing with curl too. Once that file is changed to aspx, visiting the web page shows a field to enter a command. 
 
-![Granny ASP Shell](/Granny1.png)
+![Granny ASP Shell](/images/Granny1.png)
+
+
+When we run whoami there, we see we are "Network Service". Which means, our privileges are very limited. I'll try some other exploit.
 
 
 
