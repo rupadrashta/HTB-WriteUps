@@ -241,3 +241,5 @@ Mode              Size  Type  Last modified              Name
 
 meterpreter > cat root.txt
 ```
+
+Lesson learned - Need to know more about windows privilege escalation. 
