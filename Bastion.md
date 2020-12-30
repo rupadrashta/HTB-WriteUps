@@ -242,3 +242,10 @@ There were two vhd files in that folder. One shows the Windows file system.
 
 
 I learned that **mounting vhd files is done using guestmount command. To install this, you need to run "apt install libguestfs-tools"**
+
+Then make directory /mnt/vhd on the attacker box. Then use guestmount command to mount the vhd file.
+
+```
+$guestmount --add 9b9cfbc4-369e-11e9-a17c-806e6f6e6963.vhd --inspector --ro -v /mnt/vhd 
+```
+
