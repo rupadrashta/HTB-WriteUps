@@ -249,3 +249,20 @@ Then make directory /mnt/vhd on the attacker box. Then use guestmount command to
 $guestmount --add 9b9cfbc4-369e-11e9-a17c-806e6f6e6963.vhd --inspector --ro -v /mnt/vhd 
 ```
 
+We can cd to /mnt/vhd and view the contents. I had to sudo -i as root on the attacker host.
+
+```
+──╼ $sudo -i
+┌─[root@parrot]─[~]
+└──╼ #cd /mnt/vhd
+┌─[root@parrot]─[/mnt/vhd]
+└──╼ #ls
+'$Recycle.Bin'             pagefile.sys     Recovery
+ autoexec.bat              PerfLogs        'System Volume Information'
+ config.sys                ProgramData      Users
+'Documents and Settings'  'Program Files'   Windows
+
+```
+
+
+
