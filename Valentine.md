@@ -212,6 +212,9 @@ Post-scan script results:
 |_  443/tcp: 10.10.10.79
 Nmap done: 1 IP address (1 host up) scanned in 69.67 seconds
 ```
+nmap script definitely shows the host is vulnerable to heartbleed.
+
+Heartbleed - It is a vulnerability in older versions of OpenSSL that allowed stealing sensitive information that is otherwise protected. The bug is in OpenSSL  implementation of TLS heartbeat extension. It allows the user to read memory contents, like secret keys used to encrypt the traffic, user credentials, etc.  https://heartbleed.com/ is a good source of info for this vul.
 
 I first ran dirbuster to see if it finds any files, and it did.
 
