@@ -124,7 +124,6 @@ I downloaded the three files from that folder C:\ProgramData\Paessler\PRTG Netwo
 07-14-18  02:13AM              1153755 PRTG Configuration.old.bak
 ```
 
-```
 
 In the backup config, I see the following password:
 
@@ -152,6 +151,7 @@ In settings -> Notifications, I see that we can set up notifications. We can add
 
 
 I wanted to touch a file to see if the vulnerablity could be exploited. The windows equivalent of touch is 
+
 ```
 type nul > C:\Jan32021.txt"
 ```
