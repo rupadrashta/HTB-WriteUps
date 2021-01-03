@@ -107,3 +107,71 @@ File may not have transferred correctly.
 
 Getting the user flag was easy. Let's see how to get admin access.
 
+PRTG Configuration.dat was found in Windows directory, but I could not download it. 
+
+When I go to http://10.10.10.152, I see the PRTG Network Monitor home page. There's a login screen. Online search showed that the default credentials are prtgadmin/prtgadmin, but it did not work.
+
+Another search result led to https://www.reddit.com/r/sysadmin/comments/835dai/prtg_exposes_domain_accounts_and_passwords_in/ where it shows that prtg exposes domain accounts and passwords. The config is stored in C:\ProgramData\Paessler\PRTG Network Monitor\.
+
+So back to ftp to check these folders.
+If we do "dir -a", we see the "Program data" folder.
+
+I downloaded the three files from that folder C:\ProgramData\Paessler\PRTG Network Monitor\.
+
+```
+02-25-19  09:54PM              1189697 PRTG Configuration.dat
+02-25-19  09:54PM              1189697 PRTG Configuration.old
+07-14-18  02:13AM              1153755 PRTG Configuration.old.bak
+```
+
+```
+
+In the backup config, I see the following password:
+
+```
+           <dbpassword>
+	      <!-- User: prtgadmin -->
+	      PrTg@dmin2018
+            </dbpassword>
+
+```
+
+That did not work but changing 2018 to 2019 worked.
+
+I was able to login as prtgadmin.
+
+Searching online for vulnerabilities in PRTG, I found this: https://www.cvedetails.com/cve/CVE-2018-9276/
+An issue was discovered in PRTG Network Monitor before 18.2.39. An attacker who has access to the PRTG System Administrator web console with administrative privileges can exploit an OS command injection vulnerability (both on the server and on devices) by sending malformed parameters in sensor or notification management scenarios. 
+
+
+I created a notification to execute an action.
+
+In settings -> Notifications, I see that we can set up notifications.
+
+
+I wanted to touch a file to see if the vulnerablity could be exploited. The windows equivalent of touch is 
+```
+type vul > C:\Jan32021.txt"
+```
+
+it worked.
+
+```
+331 Anonymous access allowed, send identity (e-mail name) as password.
+Password:
+230 User logged in.
+Remote system type is Windows_NT.
+ftp> dir
+200 PORT command successful.
+125 Data connection already open; Transfer starting.
+02-02-19  11:18PM                 1024 .rnd
+02-25-19  09:15PM       <DIR>          inetpub
+01-03-21  12:50PM                    0 Jan32021.txt
+07-16-16  08:18AM       <DIR>          PerfLogs
+02-25-19  09:56PM       <DIR>          Program Files
+02-02-19  11:28PM       <DIR>          Program Files (x86)
+02-03-19  07:08AM       <DIR>          Users
+02-25-19  10:49PM       <DIR>          Windows
+226 Transfer complete.
+```
+  
