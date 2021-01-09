@@ -113,4 +113,4 @@ root@Blocky:~# cat root.txt
 ```
 
 
-
+The other way to do it is by ssh as notch, browse through wordpress /var/www/html for passwords, and through /etc/phpmyadmin for passwords. We find that there is a wordpress user login in /var/www/html/wp-config.php to log into blocky/phpmyadmin. Once we log into 10.10.10.37/phpmyadmin as "wordpress" user, we can go to wordpress->wp_users and change the password for notch. Then log into 10.10.10.37/wp_admin as notch with the new password. After logging into wp-admin, we can edit themes and add a php shell. 
