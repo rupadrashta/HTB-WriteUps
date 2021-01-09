@@ -32,4 +32,21 @@ Ports 21, 22, and 80 are open. Internet search showed there are some interesting
 Ran dirbuster after that. There are a lot of results like "http://10.10.10.37/index.php/2017/07/02/welcome-to-blockycraft/".
 
 It shows a post by user notch. http://10.10.10.37/wp-includes/ shows the php scripts loaded on the web site.
+It shows http://10.10.10.37/wiki which says
+```
+Under Construction
+
+Please check back later! We will start publishing wiki articles after we have finished the main server plugin!
+
+The new core plugin will store your playtime and other information in our database, so you can see your own stats!
+```
+So I tried /plugin and /plugins.
+
+http://10.10.10.37/plugins shows two jar files. I downloaded the jar files.
+
+I am used to procyon java disassembler but for some reason, I could not build it on this machine. So I downloaded jd-gui as it was suggested as an alternative.
+
+Using jd-gui, I browsed the two jar files - BlockyCore.jar and griefprevention.jar.
+
+
 
