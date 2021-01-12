@@ -40,5 +40,7 @@ I haven't heard of nibbleblog, but the source code is at https://github.com/dign
 I also see a link - https://wikihak.com/how-to-upload-a-shell-in-nibbleblog-4-0-3/. Once we login, we can inject our own php shell and run commands.
 
 
+Tring a bunch of passwords 5 times makes us blacklisted. So we have to wait until it is cleared. After a few tries, I looked up online and found the credentials were admin/nibbles.
+
 
 
