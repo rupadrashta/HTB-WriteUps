@@ -26,5 +26,93 @@ Visiting http://10.10.10.60 gets redirected automatically to https://10.10.10.60
 Doing some directory bruteforcing using gobuster.
 
 ```
+$gobuster dir -k -u https://10.10.10.60 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 50 -x .txt,.php
+===============================================================
+Gobuster v3.0.1
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
+===============================================================
+[+] Url:            https://10.10.10.60
+[+] Threads:        50
+[+] Wordlist:       /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Status codes:   200,204,301,302,307,401,403
+[+] User Agent:     gobuster/3.0.1
+[+] Extensions:     php,txt
+[+] Timeout:        10s
+===============================================================
+2021/01/18 13:45:09 Starting gobuster
+===============================================================
+/index.php (Status: 200)
+/help.php (Status: 200)
+/themes (Status: 301)
+/stats.php (Status: 200)
+/css (Status: 301)
+/edit.php (Status: 200)
+/includes (Status: 301)
+/license.php (Status: 200)
+/system.php (Status: 200)
+/status.php (Status: 200)
+/javascript (Status: 301)
+/changelog.txt (Status: 200)
+/classes (Status: 301)
+/exec.php (Status: 200)
+/widgets (Status: 301)
+/graph.php (Status: 200)
+/tree (Status: 301)
+/wizard.php (Status: 200)
+/shortcuts (Status: 301)
+/pkg.php (Status: 200)
+/installer (Status: 301)
+/wizards (Status: 301)
+/xmlrpc.php (Status: 200)
+/reboot.php (Status: 200)
+/interfaces.php (Status: 200)
+[ERROR] 2021/01/18 13:51:33 [!] Get https://10.10.10.60/cdsa: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+/csrf (Status: 301)
+/system-users.txt (Status: 200)
+/filebrowser (Status: 301)
+/%7Echeckout%7E (Status: 403)
+===============================================================
+2021/01/18 14:09:29 Finished
 
 ```
+**It found several interesting files.**
+
+For example, https://10.10.10.60/changelog.txt shows 
+```
+# Security Changelog 
+
+### Issue
+There was a failure in updating the firewall. Manual patching is therefore required
+
+### Mitigated
+2 of 3 vulnerabilities have been patched.
+
+### Timeline
+The remaining patches will be installed during the next maintenance window
+```
+
+So chances are there is a public exploit that is not patched. Will explore that later.
+
+https://10.10.10.60/tree/ shows a silverstripe tree control v 0.1 being running. Internet search showed that it is a CMS tool with some exploits available.
+
+/system-users.txt shows the following:
+
+```
+####Support ticket###
+
+Please create the following user
+
+
+username: Rohit
+password: company defaults
+```
+
+Logging in as rohit/pfsense worked.
+
+The mainpage after logging in shows that pfsense version 2.1.3 is running. Searching for exploits gives us https://www.exploit-db.com/exploits/43560 (pfSense < 2.1.4 - 'status_rrd_graph_img.php' Command Injection) as the top result.   Trying that first, as command injection is what we want.
+
+
+
+
+
+
