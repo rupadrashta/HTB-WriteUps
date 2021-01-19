@@ -35,5 +35,5 @@ Finger is running on port 79. SSH is running on port 22022.
 
 Finger is a user information protocol that is used to view another user's basic info and return a satus report.
 
-Metasploit has an auxilliary module that can identify valid users through finger service.
+Metasploit has an auxilliary module that can identify valid users through finger service, but the result did not seem useful. I browsed for finger user enumeration exploits. Got one from pentestmonkey, called finger-user-enum.
 
