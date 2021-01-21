@@ -35,5 +35,53 @@ Finger is running on port 79. SSH is running on port 22022.
 
 Finger is a user information protocol that is used to view another user's basic info and return a satus report.
 
-Metasploit has an auxilliary module that can identify valid users through finger service, but the result did not seem useful. I browsed for finger user enumeration exploits. Got one from pentestmonkey, called finger-user-enum.
+Metasploit has an auxiliary module that can identify valid users through finger service, but the result did not seem useful. I browsed for finger user enumeration exploits. Got one from pentestmonkey, called finger-user-enum.
 
+
+```
+$./finger-user-enum.pl -U /opt/seclists/SecLists/Usernames/Names/names.txt -t 10.10.10.76 -m 50
+Starting finger-user-enum v1.0 ( http://pentestmonkey.net/tools/finger-user-enum )
+
+ ----------------------------------------------------------
+|                   Scan Information                       |
+ ----------------------------------------------------------
+
+Worker Processes ......... 50
+Usernames file ........... /opt/seclists/SecLists/Usernames/Names/names.txt
+Target count ............. 1
+Username count ........... 10177
+Target TCP port .......... 79
+Query timeout ............ 5 secs
+Relay Server ............. Not used
+
+######## Scan started at Wed Jan 20 18:13:28 2021 #########
+access@10.10.10.76: access No Access User                     < .  .  .  . >..nobody4  SunOS 4.x NFS Anonym               < .  .  .  . >..
+admin@10.10.10.76: Login       Name               TTY         Idle    When    Where..adm      Admin                              < .  .  .  . >..lp       Line Printer Admin                 < .  .  .  . >..uucp     uucp Admin                         < .  .  .  . >..nuucp    uucp Admin                         < .  .  .  . >..dladm    Datalink Admin                     < .  .  .  . >..listen   Network Admin                      < .  .  .  . >..
+anne marie@10.10.10.76: Login       Name               TTY         Idle    When    Where..anne                  ???..marie                 ???..
+bin@10.10.10.76: bin             ???                         < .  .  .  . >..
+dee dee@10.10.10.76: Login       Name               TTY         Idle    When    Where..dee                   ???..dee                   ???..
+jo ann@10.10.10.76: Login       Name               TTY         Idle    When    Where..jo                    ???..ann                   ???..
+la verne@10.10.10.76: Login       Name               TTY         Idle    When    Where..la                    ???..verne                 ???..
+line@10.10.10.76: Login       Name               TTY         Idle    When    Where..lp       Line Printer Admin                 < .  .  .  . >..
+message@10.10.10.76: Login       Name               TTY         Idle    When    Where..smmsp    SendMail Message Sub               < .  .  .  . >..
+miof mela@10.10.10.76: Login       Name               TTY         Idle    When    Where..miof                  ???..mela                  ???..
+root@10.10.10.76: root     Super-User            pts/3        <Apr 24, 2018> sunday              ..
+sammy@10.10.10.76: sammy                 console      <Jul 31 17:59>..
+sunny@10.10.10.76: sunny                 pts/3        <Apr 24, 2018> 10.10.14.4          ..
+sys@10.10.10.76: sys             ???                         < .  .  .  . >..
+zsa zsa@10.10.10.76: Login       Name               TTY         Idle    When    Where..zsa                   ???..zsa                   ???..
+######## Scan completed at Wed Jan 20 18:15:48 2021 #########
+15 results.
+
+10177 queries in 140 seconds (72.7 queries / sec)
+```
+
+Not sure what that output means, but the output for root, sammy, and sunny seems different from the rest. So focusing only on these three.
+
+```
+root@10.10.10.76: root     Super-User            pts/3        <Apr 24, 2018> sunday              ..
+sammy@10.10.10.76: sammy                 console      <Jul 31 17:59>..
+sunny@10.10.10.76: sunny                 pts/3        <Apr 24, 2018> 10.10.14.4          ..
+```
+
+We have some user accounts to try now.
