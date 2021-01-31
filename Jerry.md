@@ -27,3 +27,4 @@ It asks for a login. I tried admin/admin and obviously it did not work. It showe
 
 ![Jerry-unauthorized](/images/jerry.png)
 
+We see tomcat/s3cret somewhere in the middle of the page. 
