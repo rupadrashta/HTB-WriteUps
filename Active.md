@@ -5,7 +5,6 @@ I started with an nmap scan of Active machine (IP address: 10.10.10.100).
 
 ```
 $nmap -sC -sV 10.10.10.100
-Starting Nmap 7.80 ( https://nmap.org ) at 2021-02-13 14:36 PST
 Nmap scan report for 10.10.10.100
 Host is up (0.093s latency).
 Not shown: 986 closed ports
@@ -43,7 +42,6 @@ Ran smbclient next.
 
 ```
 $smbclient -L //10.10.10.100
-Enter WORKGROUP\vskonda's password: 
 Anonymous login successful
 
 	Sharename       Type      Comment
