@@ -5,7 +5,6 @@ I started with an nmap scan of Irked (IP address: 10.10.10.117).
 
 ```
 $nmap -sC -sV -oN irked.nmap 10.10.10.117
-Starting Nmap 7.80 ( https://nmap.org ) at 2021-02-20 16:52 PST
 Nmap scan report for 10.10.10.117
 Host is up (0.094s latency).
 Not shown: 997 closed ports
@@ -36,7 +35,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 13.71 seconds
 ```
 
-When I browse to the web page, I see a jpg and "IRC is almost working!" message. nmap scan doesn't show anything about IRC, so doing another nmap scan.
+When I browse to the web page, I see a jpg and "IRC is almost working!" message. nmap scan doesn't show anything about IRC, so doing another nmap scan. (judging by the name, Irked might be something to do with IRC.)
 
 ```
 
