@@ -1,0 +1,35 @@
+#Cheatsheet
+
+##Windows
+
+###smbclient 
+To browse a host:
+```
+smbclient -L \\IPADDRESS
+```
+To browse as a specific user:
+```
+smbclient -L \\\\IPADDRESS -U 'administrator'
+```
+or
+
+```
+smbclient "\\\\IPADDRESS\<SHARENAME>"
+```
+If it is successful, we get a smb:\> prompt. We can use dir, cd, get, and put to do file operations.
+
+
+##Linux
+
+
+
+##Redis
+redis-cli commands allow browsing through the redis database. 
+To retrieve keys:
+```
+keys *
+```
+To get a particular key
+```
+get <key urn>
+```
