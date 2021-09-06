@@ -69,3 +69,17 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
 Giovanni's link - http://10.10.10.153/moodle/user/view.php?id=3&course=1
 Algebra course link - http://10.10.10.153/moodle/course/view.php?id=2
 
+We try to login as giovanni using part of the password given above, and then enumerate using intruder to find the full password.
+
+giovanni's password is Th4C00lTheacha#.
+
+Exploring the site as giovanni shows a message to admin:
+```
+Hey admin.
+
+How am I supposed to create a quiz? I'm kinda in a hurry since I need this for tomorrow.
+
+Kind regards,
+Giovanni
+```
+
