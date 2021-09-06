@@ -17,6 +17,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 12.11 seconds
 ```
 
+
 Only port 80 is open.
 The web interface shows a web page for school. There's an announcement that the web portal was new, that the students can submit their work. Only gallery.html seems to be working.
 
@@ -36,4 +37,35 @@ Giovanni
 
 ```
 
+Ran dirbuster but it stopped after a few errors. Gobuster worked fine.
+
+```
+$gobuster dir -t 40 -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt -u http://10.10.10.153
+===============================================================
+Gobuster v3.0.1
+by OJ Reeves (@TheColonial) & Christian Mehlmauer (@_FireFart_)
+===============================================================
+[+] Url:            http://10.10.10.153
+[+] Threads:        40
+[+] Wordlist:       /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt
+[+] Status codes:   200,204,301,302,307,401,403
+[+] User Agent:     gobuster/3.0.1
+[+] Timeout:        10s
+===============================================================
+2021/09/06 12:05:28 Starting gobuster
+===============================================================
+/images (Status: 301)
+/css (Status: 301)
+/manual (Status: 301)
+/js (Status: 301)
+/javascript (Status: 301)
+/fonts (Status: 301)
+/phpmyadmin (Status: 403)
+/moodle (Status: 301)
+
+```
+/moodle shows the Teachers page, and lists Algebra course with teacher Giovanni Chhatta.
+
+Giovanni's link - http://10.10.10.153/moodle/user/view.php?id=3&course=1
+Algebra course link - http://10.10.10.153/moodle/course/view.php?id=2
 
