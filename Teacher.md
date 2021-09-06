@@ -21,3 +21,19 @@ Only port 80 is open.
 The web interface shows a web page for school. There's an announcement that the web portal was new, that the students can submit their work. Only gallery.html seems to be working.
 
 In the gallery page, the teacher photos are seen. One of the photos is not visible, the rest are not rendered properly. If we view the source of the page, we see that the photo that is not rendered is http://10.10.10.153/images/5.png.
+
+When we curl that image, we see a note.
+```
+$curl http://10.10.10.153/images/5.png
+Hi Servicedesk,
+
+I forgot the last charachter of my password. The only part I remembered is Th4C00lTheacha.
+
+Could you guys figure out what the last charachter is, or just reset it?
+
+Thanks,
+Giovanni
+
+```
+
+
